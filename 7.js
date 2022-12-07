@@ -36,14 +36,12 @@ class Dir {
   size() {
     return (
       this.files.reduce((total, { size }) => total + size, 0) +
-      this.children.reduce((total, child) => {
-        return total + child.size();
-      }, 0)
+      this.children.reduce((total, child) => total + child.size(), 0)
     );
   }
 }
 
-const crawl = ([head, ...tail], dir, listmode = false) => {
+const crawl = ([head, ...tail], dir) => {
   if (!head) {
     return dir.root();
   }
@@ -64,20 +62,16 @@ const crawl = ([head, ...tail], dir, listmode = false) => {
   }
 
   if (head.includes("$ ls")) {
-    return crawl(tail, dir, true);
+    return crawl(tail, dir);
   }
 
-  if (listmode) {
-    if (head.includes("dir")) {
-      dir.addChild(new Dir(head.replace("dir ", ""), dir));
+  if (head.includes("dir")) {
+    dir.addChild(new Dir(head.replace("dir ", ""), dir));
 
-      return crawl(tail, dir, true);
-    }
-
-    dir.addFile(...head.split(" ").reverse());
-
-    return crawl(tail, dir, true);
+    return crawl(tail, dir);
   }
+
+  dir.addFile(...head.split(" ").reverse());
 
   return crawl(tail, dir);
 };

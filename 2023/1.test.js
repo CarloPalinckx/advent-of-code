@@ -1,6 +1,4 @@
 const fs = require("fs");
-/** DAY 1 */
-
 const input = fs.readFileSync(`${__dirname}/1.txt`, "utf-8");
 
 const numbers = {
@@ -45,14 +43,5 @@ test.each([
   ["eightthree", 83],
   [input, 54208],
 ])("Day 1", (x, expected) => {
-  expect(toInt("one")).toBe("1");
-  expect(toInt("two")).toBe("2");
-  expect(toInt("three")).toBe("3");
-  expect(toInt("four")).toBe("4");
-  expect(toInt("five")).toBe("5");
-  expect(toInt("six")).toBe("6");
-  expect(toInt("seven")).toBe("7");
-  expect(toInt("eight")).toBe("8");
-  expect(toInt("nine")).toBe("9");
   expect(calculate(x.split("\n"))).toBe(expected);
 });

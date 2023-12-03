@@ -17,16 +17,32 @@ function* dissect(line) {
   });
 }
 
+const highestByColor = ([head, ...tail], highest = [0, 0, 0]) => {
+  if (!head) return highest;
+
+  return highestByColor(tail, [
+    head[0] > highest[0] ? head[0] : highest[0],
+    head[1] > highest[1] ? head[1] : highest[1],
+    head[2] > highest[2] ? head[2] : highest[2],
+  ]);
+};
+
 const count = ([head, ...tail], config, sum = 0) => {
   if (!head) return sum;
-  const violations = head[1].find(([red, green, blue]) => {
-    return red > config.red || green > config.green || blue > config.blue;
-  });
 
-  return count(tail, config, violations ? sum : sum + head[0]);
+  return count(
+    tail,
+    config,
+    sum + highestByColor(head[1]).reduce((power, cube) => power * cube, 1)
+  );
 };
 
 test.each([
+  [
+    "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
+    { red: 12, green: 13, blue: 14 },
+    48,
+  ],
   [
     `Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 	Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -34,9 +50,9 @@ test.each([
 	Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 	Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`,
     { red: 12, green: 13, blue: 14 },
-    8,
+    2286,
   ],
-  [input, { red: 12, green: 13, blue: 14 }, 0],
+  [input, { red: 12, green: 13, blue: 14 }, 66681],
 ])("Day 2", (x, config, expected) => {
   expect(
     count(

@@ -13,7 +13,7 @@ test.each([
 ......755.
 ...$.*....
 .664.598..`,
-    4361,
+    467835,
   ],
   [input, 556057],
 ])("Day 3", (input, expected) => {
@@ -25,14 +25,14 @@ test.each([
   input.split("\n").forEach((row, y) =>
     row.split("").forEach((cell, x) => {
       if (cell !== ".") {
-        map.set(toKey(x, y), cell.replace(/[^0-9]/, "*"));
+        map.set(toKey(x, y), cell);
       }
     })
   );
 
   const entries = map.entries();
-  const digits = Array.from(entries).filter((entry) => {
-    return entry[1] !== "*";
+  const gears = Array.from(entries).filter((entry) => {
+    return entry[1] === "*";
   });
 
   /**
@@ -41,7 +41,7 @@ test.each([
    * [-1, 1], [ 0, 1], [ 1, 1]
    */
 
-  const hasAdjacentSymbol = (coords) => {
+  const getAdjacentDigits = (coords) => {
     const [x, y] = toCoords(coords);
 
     const adjacent = [
@@ -55,12 +55,11 @@ test.each([
       toKey(x + 1, y + 1),
     ];
 
-    return (
-      adjacent.filter((key) => {
-        const value = map.get(key);
-        return value === "*";
-      }).length > 0
-    );
+    return adjacent.filter((key) => {
+      const value = map.get(key);
+
+      return !isNaN(parseInt(value, 10));
+    });
   };
 
   const findPrevious = ([x, y], total = "") => {
@@ -76,21 +75,28 @@ test.each([
     return findNext([x + 1, y], `${total}${next}`);
   };
 
-  digits.forEach((digit) => {
-    if (hasAdjacentSymbol(digit[0])) {
-      const [prev, leftBoundary] = findPrevious(toCoords(digit[0]));
-      const [next, rightBoundary] = findNext(toCoords(digit[0]));
+  let sum = 0;
 
-      found.add(
-        `${prev}${map.get(digit[0])}${next}:${leftBoundary}-${rightBoundary}`
+  gears.forEach((gear) => {
+    const adjacentDigits = getAdjacentDigits(gear[0]);
+    const adjacents = new Set();
+
+    adjacentDigits.forEach((digit) => {
+      const [prev, leftBoundary] = findPrevious(toCoords(digit));
+      const [next, rightBoundary] = findNext(toCoords(digit));
+
+      adjacents.add(
+        `${prev}${map.get(digit)}${next}:${leftBoundary}-${rightBoundary}`
       );
+    });
+
+    if (adjacents.size === 2) {
+      const iterator = adjacents[Symbol.iterator]();
+      sum +=
+        iterator.next().value.split(":")[0] *
+        iterator.next().value.split(":")[0];
     }
   });
-  console.log(found);
-  const sum = Array.from(found).reduce(
-    (sum, digit) => sum + parseInt(digit, 10),
-    0
-  );
 
   expect(sum).toBe(expected);
 });

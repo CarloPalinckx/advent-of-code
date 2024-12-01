@@ -10,7 +10,7 @@ const example = `3   4
 
 test.each([
   [example, 11],
-  [input, 19051889],
+  [input, 2066446],
 ])("Day 1", (input, expected) => {
   const lines = input.split("\n");
   const lArr = [];
@@ -42,6 +42,33 @@ test.each([
 
     total += Math.abs(diff);
   }
+
+  expect(total).toBe(expected);
+});
+
+test.each([
+  [example, 31],
+  [input, 24931009],
+])("Day 1.2", (input, expected) => {
+  const lines = input.split("\n");
+  const lArr = [];
+  const rArr = [];
+
+  const ints = lines.map((line) => {
+    return line.split("   ").map((n) => parseInt(n, 10));
+  });
+
+  ints.forEach(([x, y]) => {
+    lArr.push(x);
+    rArr.push(y);
+  });
+
+  const l = [...lArr].sort();
+  const r = [...rArr].sort();
+
+  const total = l.reduce((acc, curr) => {
+    return (acc += r.filter((n) => n === curr).length * curr);
+  }, 0);
 
   expect(total).toBe(expected);
 });
